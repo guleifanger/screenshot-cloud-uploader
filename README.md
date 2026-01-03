@@ -1,5 +1,10 @@
 # Screenshot Cloud Uploader 📸☁️
 
+[![GitHub stars](https://img.shields.io/github/stars/guleifanger/screenshot-cloud-uploader?style=social)](https://github.com/guleifanger/screenshot-cloud-uploader/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/guleifanger/screenshot-cloud-uploader)](https://github.com/guleifanger/screenshot-cloud-uploader/issues)
+[![GitHub license](https://img.shields.io/github/license/guleifanger/screenshot-cloud-uploader)](https://github.com/guleifanger/screenshot-cloud-uploader/blob/main/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/guleifanger/screenshot-cloud-uploader)](https://github.com/guleifanger/screenshot-cloud-uploader/releases)
+
 **Automatic cloud upload for GNOME Wayland screenshots** - Take a screenshot, get an instant shareable link!
 
 A lightweight background service that automatically uploads your screenshots to the cloud and copies the link to your clipboard. Perfect for quick sharing on chat, social media, or documentation.
