@@ -1,0 +1,231 @@
+#!/bin/bash
+################################################################################
+# Screenshot Cloud Uploader
+#
+# Monitors ~/Pictures/Screenshots and automatically uploads new screenshots
+# to cloud storage services, copying the shareable link to clipboard.
+#
+# Author: Claude & Gule
+# License: MIT
+# Repository: https://github.com/YOUR_USERNAME/screenshot-cloud-uploader
+################################################################################
+
+set -euo pipefail
+
+# Configuration
+SCREENSHOT_DIR="${SCREENSHOT_DIR:-$HOME/Pictures/Screenshots}"
+LOG_FILE="${LOG_FILE:-/tmp/screenshot-uploader.log}"
+SUPPORTED_FORMATS="png|jpg|jpeg|gif|webp|PNG|JPG|JPEG|GIF|WEBP"
+
+# Colors for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
+# Ensure screenshot directory exists
+mkdir -p "$SCREENSHOT_DIR"
+
+################################################################################
+# Functions
+################################################################################
+
+log() {
+    echo -e "${BLUE}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $*"
+}
+
+log_success() {
+    echo -e "${GREEN}✓${NC} $*"
+}
+
+log_error() {
+    echo -e "${RED}✗${NC} $*"
+}
+
+log_warning() {
+    echo -e "${YELLOW}⚠${NC} $*"
+}
+
+notify() {
+    local title="$1"
+    local message="$2"
+    local urgency="${3:-normal}"
+    notify-send "$title" "$message" -u "$urgency" 2>/dev/null || true
+}
+
+copy_to_clipboard() {
+    local text="$1"
+    if command -v wl-copy &>/dev/null; then
+        echo "$text" | wl-copy 2>/dev/null || true
+    elif command -v xclip &>/dev/null; then
+        echo "$text" | xclip -selection clipboard 2>/dev/null || true
+    fi
+}
+
+# Upload to catbox.moe (no expiration, reliable)
+upload_catbox() {
+    local filepath="$1"
+    local url
+
+    url=$(curl -f -s -F "reqtype=fileupload" -F "fileToUpload=@$filepath" \
+        https://catbox.moe/user/api.php 2>/dev/null || echo "")
+
+    if [[ "$url" =~ ^https://files\.catbox\.moe ]]; then
+        echo "$url"
+        return 0
+    fi
+    return 1
+}
+
+# Upload to imgur
+upload_imgur() {
+    local filepath="$1"
+    local response url
+
+    response=$(curl -f -s -X POST \
+        -H "Authorization: Client-ID 4c8932f91123ae9" \
+        -F "image=@$filepath" \
+        https://api.imgur.com/3/image 2>/dev/null || echo "")
+
+    url=$(echo "$response" | grep -oP '"link":"\K[^"]+' | head -1)
+
+    if [[ -n "$url" ]]; then
+        echo "$url"
+        return 0
+    fi
+    return 1
+}
+
+# Upload to filebin.net
+upload_filebin() {
+    local filepath="$1"
+    local filename=$(basename "$filepath")
+    local bin_id url
+
+    bin_id=$(curl -f -s -X POST https://filebin.net 2>/dev/null | \
+        grep -oP 'https://filebin\.net/\K[^"]+' | head -1)
+
+    if [[ -n "$bin_id" ]]; then
+        curl -f -s -X POST \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary "@$filepath" \
+            "https://filebin.net/$bin_id/$filename" >/dev/null 2>&1
+
+        url="https://filebin.net/$bin_id/$filename"
+        echo "$url"
+        return 0
+    fi
+    return 1
+}
+
+upload_file() {
+    local filepath="$1"
+    local filename=$(basename "$filepath")
+    local url=""
+
+    log "📸 New screenshot detected: $filename"
+
+    # Try catbox.moe first (most reliable, no expiration)
+    if url=$(upload_catbox "$filepath"); then
+        copy_to_clipboard "$url"
+        notify "Screenshot uploaded!" "Link copied: $url"
+        log_success "Upload complete!"
+        log "  Service: Catbox.moe"
+        log "  URL: $url"
+        echo ""
+        return 0
+    fi
+
+    # Fallback: Imgur
+    log_warning "Trying imgur..."
+    if url=$(upload_imgur "$filepath"); then
+        copy_to_clipboard "$url"
+        notify "Screenshot uploaded!" "Link copied: $url"
+        log_success "Upload complete!"
+        log "  Service: Imgur"
+        log "  URL: $url"
+        echo ""
+        return 0
+    fi
+
+    # Fallback: Filebin.net
+    log_warning "Trying filebin.net..."
+    if url=$(upload_filebin "$filepath"); then
+        copy_to_clipboard "$url"
+        notify "Screenshot uploaded!" "Link copied: $url (expires in 6 months)"
+        log_success "Upload complete!"
+        log "  Service: Filebin.net"
+        log "  URL: $url"
+        log_warning "Note: Link expires in 6 months"
+        echo ""
+        return 0
+    fi
+
+    # All services failed
+    notify "Screenshot Upload Failed" "All services failed. File saved locally." "critical"
+    log_error "All upload services failed"
+    log "  File saved: $filepath"
+    echo ""
+    return 1
+}
+
+check_dependencies() {
+    local missing_deps=()
+
+    command -v inotifywait &>/dev/null || missing_deps+=("inotify-tools")
+    command -v curl &>/dev/null || missing_deps+=("curl")
+    command -v notify-send &>/dev/null || missing_deps+=("libnotify-bin")
+
+    if ! command -v wl-copy &>/dev/null && ! command -v xclip &>/dev/null; then
+        missing_deps+=("wl-clipboard or xclip")
+    fi
+
+    if [[ ${#missing_deps[@]} -gt 0 ]]; then
+        log_error "Missing dependencies: ${missing_deps[*]}"
+        log "Install with: sudo apt install ${missing_deps[*]}"
+        exit 1
+    fi
+}
+
+################################################################################
+# Main
+################################################################################
+
+main() {
+    # Check dependencies
+    check_dependencies
+
+    # Print startup information
+    log "🚀 Screenshot Cloud Uploader started!"
+    log "📁 Monitoring: $SCREENSHOT_DIR"
+    log "💡 Take screenshots using:"
+    log "   • Print Screen - Interactive screenshot"
+    log "   • Shift+Print - Fullscreen"
+    log "   • Alt+Print - Active window"
+    log "   Screenshots will be automatically uploaded!"
+    echo ""
+
+    notify "Screenshot Uploader" "Monitoring started! Use Print Screen for screenshots."
+
+    # Monitor directory for new files
+    inotifywait -m -e close_write -e moved_to "$SCREENSHOT_DIR" --format '%w%f' 2>/dev/null |
+    while IFS= read -r filepath; do
+        # Check if file is an image
+        if [[ "$filepath" =~ \.($SUPPORTED_FORMATS)$ ]]; then
+            # Wait for file to be completely written
+            sleep 0.5
+
+            # Verify file exists and is not empty
+            if [[ -f "$filepath" ]] && [[ -s "$filepath" ]]; then
+                upload_file "$filepath"
+            fi
+        fi
+    done
+}
+
+# Handle termination gracefully
+trap 'log "👋 Screenshot uploader stopped"; exit 0' SIGINT SIGTERM
+
+# Run main function
+main
