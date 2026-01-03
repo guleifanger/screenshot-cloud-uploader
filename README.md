@@ -45,13 +45,13 @@ A lightweight background service that automatically uploads your screenshots to 
 ## 🚀 Quick Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/screenshot-cloud-uploader/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/guleifanger/screenshot-cloud-uploader/main/install.sh | bash
 ```
 
 Or manually:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/screenshot-cloud-uploader.git
+git clone https://github.com/guleifanger/screenshot-cloud-uploader.git
 cd screenshot-cloud-uploader
 chmod +x install.sh
 ./install.sh
@@ -232,8 +232,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/screenshot-cloud-uploader/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/YOUR_USERNAME/screenshot-cloud-uploader/discussions)
+- **Issues**: [GitHub Issues](https://github.com/guleifanger/screenshot-cloud-uploader/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/guleifanger/screenshot-cloud-uploader/discussions)
 
 ## ⭐ Show Your Support
 
@@ -241,7 +241,7 @@ If you find this tool useful, please consider:
 - ⭐ Starring the repository
 - 🐛 Reporting bugs
 - 💬 Sharing with friends
-- ☕ [Buying me a coffee](https://buymeacoffee.com/YOUR_USERNAME) (optional)
+- ☕ [Buying me a coffee](https://buymeacoffee.com/guleifanger) (optional)
 
 ---
 

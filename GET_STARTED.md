@@ -43,8 +43,8 @@ All files are:
 ```bash
 cd ~/screenshot-cloud-uploader
 
-# Add your GitHub remote (replace YOUR_USERNAME)
-git remote add origin https://github.com/YOUR_USERNAME/screenshot-cloud-uploader.git
+# Add your GitHub remote (replace guleifanger)
+git remote add origin https://github.com/guleifanger/screenshot-cloud-uploader.git
 
 # Push everything
 git branch -M main

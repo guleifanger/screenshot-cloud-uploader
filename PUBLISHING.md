@@ -19,7 +19,7 @@ This document explains how to publish this project to GitHub and potentially con
 cd ~/screenshot-cloud-uploader
 
 # Add remote
-git remote add origin https://github.com/YOUR_USERNAME/screenshot-cloud-uploader.git
+git remote add origin https://github.com/guleifanger/screenshot-cloud-uploader.git
 
 # Push to main branch (rename master to main if needed)
 git branch -M main
@@ -191,9 +191,9 @@ Another universal packaging option:
 
 1. **Add badges** to README:
    ```markdown
-   ![GitHub stars](https://img.shields.io/github/stars/YOUR_USERNAME/screenshot-cloud-uploader)
-   ![GitHub issues](https://img.shields.io/github/issues/YOUR_USERNAME/screenshot-cloud-uploader)
-   ![License](https://img.shields.io/github/license/YOUR_USERNAME/screenshot-cloud-uploader)
+   ![GitHub stars](https://img.shields.io/github/stars/guleifanger/screenshot-cloud-uploader)
+   ![GitHub issues](https://img.shields.io/github/issues/guleifanger/screenshot-cloud-uploader)
+   ![License](https://img.shields.io/github/license/guleifanger/screenshot-cloud-uploader)
    ```
 
 2. **Write blog post** explaining the project

@@ -31,5 +31,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependency checking during installation
 - GNOME screenshot settings auto-configuration
 
-[Unreleased]: https://github.com/YOUR_USERNAME/screenshot-cloud-uploader/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/YOUR_USERNAME/screenshot-cloud-uploader/releases/tag/v1.0.0
+[Unreleased]: https://github.com/guleifanger/screenshot-cloud-uploader/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/guleifanger/screenshot-cloud-uploader/releases/tag/v1.0.0
